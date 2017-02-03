@@ -645,9 +645,26 @@ public class UberLoggerEditorWindow : EditorWindow, UberLoggerEditor.ILoggerWind
     void JumpToSource(LogStackFrame frame)
     {
         var filename = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), frame.FileName);
+
         if (System.IO.File.Exists(filename))
         {
-            UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(frame.FileName, frame.LineNumber);
+          //UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(frame.FileName, frame.LineNumber);
+
+          if (frame.FileName.StartsWith(Application.dataPath))
+          {
+            var relativepath =
+              "Assets" + frame.FileName.Substring(Application.dataPath.Length);
+
+            var scriptAsset = AssetDatabase.LoadMainAssetAtPath(relativepath);
+
+            AssetDatabase.OpenAsset(scriptAsset, frame.LineNumber);
+          }
+          else
+          {
+            var scriptAsset = AssetDatabase.LoadMainAssetAtPath(frame.FileName);
+
+            AssetDatabase.OpenAsset(scriptAsset, frame.LineNumber);
+          }
         }
     }
 
